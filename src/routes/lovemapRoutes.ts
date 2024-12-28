@@ -5,12 +5,14 @@ import {
   updateLovemapItem,
   deleteLovemapItem,
 } from '../controllers/lovemapController';
+import { validateRequest } from '../middlewares/validateRequest';
+import { lovemapSchema } from '../schemas/lovemapSchema';
 
-const lovemapRoutes = Router();
+const router = Router();
 
-lovemapRoutes.get('/', getLovemapItems);
-lovemapRoutes.post('/', createLovemapItem);
-lovemapRoutes.put('/:id', updateLovemapItem);
-lovemapRoutes.delete('/:id', deleteLovemapItem);
+router.get('/', getLovemapItems);
+router.post('/', validateRequest(lovemapSchema), createLovemapItem);
+router.put('/:id', validateRequest(lovemapSchema), updateLovemapItem);
+router.delete('/:id', deleteLovemapItem);
 
-export default lovemapRoutes;
+export default router;

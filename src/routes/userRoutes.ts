@@ -6,13 +6,15 @@ import {
   updateUser,
   deleteUser,
 } from '../controllers/userController';
+import { validateRequest } from '../middlewares/validateRequest';
+import { createUserSchema, updateUserSchema } from '../schemas/userSchema';
 
-const userRoutes = Router();
+const router = Router();
 
-userRoutes.get('/', getUsers);
-userRoutes.get('/:id', getUserById);
-userRoutes.post('/', createUser);
-userRoutes.put('/:id', updateUser);
-userRoutes.delete('/:id', deleteUser);
+router.get('/', getUsers);
+router.get('/:id', getUserById);
+router.post('/', validateRequest(createUserSchema), createUser);
+router.put('/:id', validateRequest(updateUserSchema), updateUser);
+router.delete('/:id', deleteUser);
 
-export default userRoutes;
+export default router;

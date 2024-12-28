@@ -5,12 +5,14 @@ import {
   updateTimeline,
   deleteTimeline,
 } from '../controllers/timelineController';
+import { validateRequest } from '../middlewares/validateRequest';
+import { timelineSchema } from '../schemas/timelineSchema';
 
-const timelineRoutes = Router();
+const router = Router();
 
-timelineRoutes.get('/', getTimelines);
-timelineRoutes.post('/', createTimeline);
-timelineRoutes.put('/:id', updateTimeline);
-timelineRoutes.delete('/:id', deleteTimeline);
+router.get('/', getTimelines);
+router.post('/', validateRequest(timelineSchema), createTimeline);
+router.put('/:id', validateRequest(timelineSchema), updateTimeline);
+router.delete('/:id', deleteTimeline);
 
-export default timelineRoutes;
+export default router;

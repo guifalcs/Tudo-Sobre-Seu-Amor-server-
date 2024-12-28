@@ -21,6 +21,15 @@ async function main() {
     },
   });
 
+  const subscriptionNone = await prisma.subscription.upsert({
+    where:{ title: 'none'},
+    update:{},
+    create:{
+      title: 'none',
+      price: 0.0,    
+    }
+  });
+
   const subscriptionBasico = await prisma.subscription.upsert({
     where:{ title: 'basico'},
     update:{},

@@ -5,12 +5,14 @@ import {
   updateSpecialDate,
   deleteSpecialDate,
 } from '../controllers/specialDateController';
+import { validateRequest } from '../middlewares/validateRequest';
+import { specialDateSchema } from '../schemas/specialDateSchema';
 
-const specialDateRouter = Router();
+const router = Router();
 
-specialDateRouter.get('/', getSpecialDates);
-specialDateRouter.post('/', createSpecialDate);
-specialDateRouter.put('/:id', updateSpecialDate);
-specialDateRouter.delete('/:id', deleteSpecialDate);
+router.get('/', getSpecialDates);
+router.post('/', validateRequest(specialDateSchema), createSpecialDate);
+router.put('/:id', validateRequest(specialDateSchema), updateSpecialDate);
+router.delete('/:id', deleteSpecialDate);
 
-export default specialDateRouter;
+export default router;

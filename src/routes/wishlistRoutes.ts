@@ -5,12 +5,14 @@ import {
   updateWishlistItem,
   deleteWishlistItem,
 } from '../controllers/wishlistController';
+import { validateRequest } from '../middlewares/validateRequest';
+import { wishlistSchema } from '../schemas/wishlistSchema';
 
-const wishlistRouter = Router();
+const router = Router();
 
-wishlistRouter.get('/', getWishlistItems);
-wishlistRouter.post('/', createWishlistItem);
-wishlistRouter.put('/:id', updateWishlistItem);
-wishlistRouter.delete('/:id', deleteWishlistItem);
+router.get('/', getWishlistItems);
+router.post('/', validateRequest(wishlistSchema), createWishlistItem);
+router.put('/:id', validateRequest(wishlistSchema), updateWishlistItem);
+router.delete('/:id', deleteWishlistItem);
 
-export default wishlistRouter;
+export default router;
