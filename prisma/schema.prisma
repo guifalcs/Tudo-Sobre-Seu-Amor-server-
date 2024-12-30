@@ -6,13 +6,25 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum UserStatus {
+  active
+  inactive
+}
+
+enum SubscriptionType {
+  none
+  basico
+  romantico
+  apaixonado
+}
+
 model User {
   id           String        @id @default(uuid())
   name         String
   email        String        @unique
   password     String
-  status       String?
-  subscriptionId String?
+  status       String
+  subscriptionId String
   subscription Subscription? @relation(fields: [subscriptionId], references: [id])
   specialDates SpecialDate[]
   timeline     Timeline[]
@@ -86,7 +98,7 @@ model Achievements {
 model Subscription {
   id        String   @id @default(uuid())
   title     String   @unique
-  price     Float    @unique
+  price     Float    
   users     User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

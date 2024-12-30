@@ -10,16 +10,17 @@ async function main() {
   const password = process.env.ADMIN_PASSWORD || 'admin123'
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const admin = await prisma.user.upsert({
-    where: { email },
-    update: {},
-    create: {
-      name,
-      email,
-      password: hashedPassword,
-      status: 'active'
-    },
-  });
+  // const admin = await prisma.user.upsert({
+  //   where: { email },
+  //   update: {},
+  //   create: {
+  //     name,
+  //     email,
+  //     password: hashedPassword,
+  //     status: 'active',
+  //     subscriptionId: ''
+  //   },
+  // });
 
   const subscriptionNone = await prisma.subscription.upsert({
     where:{ title: 'none'},

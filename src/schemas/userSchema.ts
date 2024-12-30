@@ -1,11 +1,23 @@
 import { z } from 'zod';
 
+const UserStatus = z.enum(['active', 'inactive']);
+const SubscriptionType = z.enum(['none', 'basico', 'romantico', 'apaixonado']);
+
 export const createUserSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  subscription: z.enum(['none','basico','romantico','apaixonado']).default('none'),
-  status: z.enum(['active', 'inactive']).default('active'),
+  subscription: SubscriptionType.default('none'),
+  status: UserStatus.default('active'),
 });
 
-export const updateUserSchema = createUserSchema.partial()
+export const updateUserSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  email: z.string().email('Invalid email format').optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
+  subscription: SubscriptionType.optional(),
+  status: UserStatus.optional(),
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;
