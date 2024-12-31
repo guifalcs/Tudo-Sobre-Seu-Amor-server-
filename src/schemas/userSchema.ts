@@ -20,10 +20,15 @@ export const updateUserSchema = z.object({
 });
 
 export const findUserSchema = z.object({
+  id: z.string().min(1, 'User id is required')
+});
+
+export const loginUserSchema = z.object({
   email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(6, 'Password has at least 6 characters'),
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type FindUserInput = z.infer<typeof findUserSchema>;
+export type loginUserInput = z.infer<typeof loginUserSchema>;

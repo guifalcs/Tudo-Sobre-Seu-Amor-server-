@@ -29,14 +29,14 @@ export const errorHandler: ErrorRequestHandler = (
     if (err.code === 'P2002') {
       res.status(409).json({
         error: 'ConflictError',
-        message: 'A record with this value already exists',
+        message: 'Esse email já está cadastrado em outra conta',
       });
       return;
     }
     if (err.code === 'P2025') {
       res.status(404).json({
         error: 'NotFoundError',
-        message: 'Record not found',
+        message: 'Registro não encontrado',
       });
       return;
     }
@@ -45,6 +45,6 @@ export const errorHandler: ErrorRequestHandler = (
   console.error(err);
   res.status(500).json({
     error: 'InternalServerError',
-    message: 'An unexpected error occurred',
+    message: 'Um erro inesperado ocorreu',
   });
 };

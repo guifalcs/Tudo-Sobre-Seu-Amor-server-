@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import asyncHandler from "express-async-handler";
 import { NotFoundError } from "../lib/errors";
-import { createUserSchema, updateUserSchema } from "../schemas/userSchema";
+import {
+  createUserSchema,
+  loginUserSchema,
+  updateUserSchema,
+} from "../schemas/userSchema";
 import bcrypt from "bcryptjs";
 import { UserCreateData, UserUpdateData } from "../types/user";
 import jwt from "jsonwebtoken";
@@ -16,7 +20,7 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
 
 export const getUserById = asyncHandler(async (req: Request, res: Response) => {
   const user = await prisma.user.findUnique({
-    where: { email: req.body.email },
+    where: { email: req.params.id },
     include: {
       specialDates: true,
       timeline: true,
@@ -29,22 +33,42 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
     throw new NotFoundError("User");
   }
 
-  const isPasswordValid = await bcrypt.compare(
-    req.body.password,
-    user.password
-  );
-  if (!isPasswordValid) {
-    res.status(401).json({ message: "Senha incorreta." });
-  } else {
-    const { password: _, ...userWithoutPassword } = user;
+  res.status(200).json({ user });
+});
 
-    const token = jwt.sign({ userWithoutPassword }, secret_key, {
-      expiresIn: "30d",
+export const getUserLogin = asyncHandler(
+  async (req: Request, res: Response) => {
+    const validatedData = await loginUserSchema.parseAsync(req.body);
+
+    const user = await prisma.user.findUnique({
+      where: { email: req.body.email },
+      include: {
+        specialDates: true,
+        timeline: true,
+        wishlist: true,
+        lovemap: true,
+      },
     });
 
-    res.status(200).json({ user: userWithoutPassword, token });
+    if (!user) {
+      throw new NotFoundError("User");
+    }
+
+    const { password, ...userWithoutPassword } = user;
+
+    if (password != req.body.password) {
+      res.status(400).json("Senha incorreta");
+    } else {
+      const id = user.id;
+
+      const token = jwt.sign({ id }, secret_key, {
+        expiresIn: "30d",
+      });
+
+      res.status(201).json({ user: userWithoutPassword, token });
+    }
   }
-});
+);
 
 export const createUser = asyncHandler(async (req: Request, res: Response) => {
   const validatedData = await createUserSchema.parseAsync(req.body);
@@ -74,12 +98,13 @@ export const createUser = asyncHandler(async (req: Request, res: Response) => {
     });
 
     const { password, ...userWithoutPassword } = user;
+    const id = user.id;
 
-    const token = jwt.sign({ userWithoutPassword }, secret_key, {
+    const token = jwt.sign({ id }, secret_key, {
       expiresIn: "30d",
     });
 
-    res.status(201).json({ userWithoutPassword, token });
+    res.status(201).json({ user: userWithoutPassword, token });
   }
 });
 
