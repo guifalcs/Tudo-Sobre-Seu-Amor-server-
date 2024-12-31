@@ -5,6 +5,9 @@ import { NotFoundError } from "../lib/errors";
 import { createUserSchema, updateUserSchema } from "../schemas/userSchema";
 import bcrypt from "bcryptjs";
 import { UserCreateData, UserUpdateData } from "../types/user";
+import jwt from "jsonwebtoken";
+
+const secret_key = process.env.JWT_SECRET_KEY || "you_secret_key";
 
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await prisma.user.findMany();
@@ -13,7 +16,7 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
 
 export const getUserById = asyncHandler(async (req: Request, res: Response) => {
   const user = await prisma.user.findUnique({
-    where: { id: req.params.id },
+    where: { email: req.body.email },
     include: {
       specialDates: true,
       timeline: true,
@@ -26,7 +29,21 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
     throw new NotFoundError("User");
   }
 
-  res.json(user);
+  const isPasswordValid = await bcrypt.compare(
+    req.body.password,
+    user.password
+  );
+  if (!isPasswordValid) {
+    res.status(401).json({ message: "Senha incorreta." });
+  } else {
+    const { password: _, ...userWithoutPassword } = user;
+
+    const token = jwt.sign({ userWithoutPassword }, secret_key, {
+      expiresIn: "30d",
+    });
+
+    res.status(200).json({ user: userWithoutPassword, token });
+  }
 });
 
 export const createUser = asyncHandler(async (req: Request, res: Response) => {
@@ -57,7 +74,12 @@ export const createUser = asyncHandler(async (req: Request, res: Response) => {
     });
 
     const { password, ...userWithoutPassword } = user;
-    res.status(201).json(userWithoutPassword);
+
+    const token = jwt.sign({ userWithoutPassword }, secret_key, {
+      expiresIn: "30d",
+    });
+
+    res.status(201).json({ userWithoutPassword, token });
   }
 });
 
