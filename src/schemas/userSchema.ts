@@ -19,10 +19,6 @@ export const updateUserSchema = z.object({
   status: UserStatus.optional(),
 });
 
-export const findUserSchema = z.object({
-  id: z.string().min(1, 'User id is required')
-});
-
 export const loginUserSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password has at least 6 characters'),
@@ -30,5 +26,4 @@ export const loginUserSchema = z.object({
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
-export type FindUserInput = z.infer<typeof findUserSchema>;
 export type loginUserInput = z.infer<typeof loginUserSchema>;

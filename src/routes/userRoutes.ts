@@ -8,12 +8,12 @@ import {
   getUserLogin,
 } from '../controllers/userController';
 import { validateRequest } from '../middlewares/validateRequest';
-import { createUserSchema, findUserSchema, loginUserSchema, updateUserSchema } from '../schemas/userSchema';
+import { createUserSchema, loginUserSchema, updateUserSchema } from '../schemas/userSchema';
 
 const router = Router();
 
 router.get('/', getUsers);
-router.get('/:id', validateRequest(findUserSchema),getUserById);
+router.get('/:id', getUserById);
 router.post('/signup', validateRequest(createUserSchema), createUser);
 router.post('/login', validateRequest(loginUserSchema), getUserLogin);
 router.put('/:id', validateRequest(updateUserSchema), updateUser);

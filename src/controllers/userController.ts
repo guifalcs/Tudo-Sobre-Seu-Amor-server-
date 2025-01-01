@@ -20,12 +20,13 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
 
 export const getUserById = asyncHandler(async (req: Request, res: Response) => {
   const user = await prisma.user.findUnique({
-    where: { email: req.params.id },
+    where: { id: req.params.id },
     include: {
       specialDates: true,
       timeline: true,
       wishlist: true,
       lovemap: true,
+      subscription: true
     },
   });
 
@@ -38,6 +39,7 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
 
 export const getUserLogin = asyncHandler(
   async (req: Request, res: Response) => {
+
     const validatedData = await loginUserSchema.parseAsync(req.body);
 
     const user = await prisma.user.findUnique({
@@ -56,8 +58,11 @@ export const getUserLogin = asyncHandler(
 
     const { password, ...userWithoutPassword } = user;
 
-    if (password != req.body.password) {
-      res.status(400).json("Senha incorreta");
+
+    const isPasswordValid = await bcrypt.compare(req.body.password, password)
+
+    if(!isPasswordValid){
+      res.status(400).json('Senha incorreta');
     } else {
       const id = user.id;
 
