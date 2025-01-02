@@ -89,7 +89,7 @@ export const createUser = asyncHandler(async (req: Request, res: Response) => {
     const subscriptionId = subscription!.id;
 
     const userData: UserCreateData = {
-      name: validatedData.name,
+      name: validatedData.name.toLocaleLowerCase(),
       email: validatedData.email,
       password: hashedPassword,
       status: validatedData.status,
