@@ -10,50 +10,38 @@ async function main() {
   const password = process.env.ADMIN_PASSWORD || 'admin123'
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // const admin = await prisma.user.upsert({
-  //   where: { email },
-  //   update: {},
-  //   create: {
-  //     name,
-  //     email,
-  //     password: hashedPassword,
-  //     status: 'active',
-  //     subscriptionId: ''
-  //   },
-  // });
-
   const subscriptionNone = await prisma.subscription.upsert({
-    where:{ title: 'none'},
+    where:{ title: 'Nenhum'},
     update:{},
     create:{
-      title: 'none',
+      title: 'Nenhum',
       price: 0.0,    
     }
   });
 
   const subscriptionBasico = await prisma.subscription.upsert({
-    where:{ title: 'basico'},
+    where:{ title: 'Básico'},
     update:{},
     create:{
-      title: 'basico',
+      title: 'Básico',
       price: 0.0,    
     }
   });
 
   const subscriptionRomantico = await prisma.subscription.upsert({
-    where:{ title: 'romantico'},
+    where:{ title: 'Romântico'},
     update:{},
     create:{
-      title: 'romantico',
+      title: 'Romântico',
       price: 9.99,    
     }
   });
 
   const subscriptionApaixonado = await prisma.subscription.upsert({
-    where:{ title: 'apaixonado'},
+    where:{ title: 'Apaixonado'},
     update:{},
     create:{
-      title: 'apaixonado',
+      title: 'Apaixonado',
       price: 19.99,    
     }
   });
