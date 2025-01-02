@@ -1,27 +1,27 @@
 import { z } from 'zod';
 
-const UserStatus = z.enum(['active', 'inactive']);
-const SubscriptionType = z.enum(['none', 'basico', 'romantico', 'apaixonado']);
+const UserStatus = z.enum(['Ativo', 'Inativo']);
+const SubscriptionType = z.enum(['Nenhum', 'Básico', 'Romântico', 'Apaixonado']);
 
 export const createUserSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  subscription: SubscriptionType.default('none'),
-  status: UserStatus.default('active'),
+  name: z.string().min(2, 'Nome tem que ter pelo menos 2 caracteres'),
+  email: z.string().email('Formato de email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+  subscription: SubscriptionType.default('Nenhum'),
+  status: UserStatus.default('Ativo'),
 });
 
 export const updateUserSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').optional(),
-  email: z.string().email('Invalid email format').optional(),
-  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
+  name: z.string().min(2, 'Nome tem que ter pelo menos 2 caracteres').optional(),
+  email: z.string().email('Formato de email inválido').optional(),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres').optional(),
   subscription: SubscriptionType.optional(),
   status: UserStatus.optional(),
 });
 
 export const loginUserSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password has at least 6 characters'),
+  email: z.string().email('Formato de email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
