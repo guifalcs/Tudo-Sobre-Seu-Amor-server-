@@ -1,4 +1,4 @@
-(API da aplicação)
+# Sobre o Projeto
 
 O projeto "Tudo Sobre Seu Amor" é a minha primeira plataforma SAAS, ainda em desenvolvimento, que tem como objetivo ser um meio de pessoas centralizarem as informações de seus relacionamentos, evitando esquecimentos e possibilitando-as enxergar o momento de maneira mais especial e visual. Além disso, ela conterá features para contribuir com o dia a dia do casal, como lembretes de datas importantes.
 
