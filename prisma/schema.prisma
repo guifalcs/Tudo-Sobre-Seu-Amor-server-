@@ -19,21 +19,35 @@ enum SubscriptionType {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  password     String
-  status       String
-  subscriptionId String
-  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
-  specialDates SpecialDate[]
-  timeline     Timeline[]
-  wishlist     Wishlist[]
-  lovemap      Lovemap[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id              String        @id @default(uuid())
+  name            String
+  email           String        @unique
+  password        String
+  status          String
+  subscriptionId  String
+  subscription    Subscription? @relation(fields: [subscriptionId], references: [id])
+  specialDates    SpecialDate[]
+  timeline        Timeline[]
+  wishlist        Wishlist[]
+  lovemap         Lovemap[]
+  relationship    Relationship[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   @@map("users")
+}
+
+model Relationship {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  partnerName  String
+  startDate    DateTime
+  createdAt    DateTime @default(now())  
+  updatedAt    DateTime @updatedAt
+
+  @@map("relationships")
+
 }
 
 model SpecialDate {
