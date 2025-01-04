@@ -26,7 +26,8 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
       timeline: true,
       wishlist: true,
       lovemap: true,
-      subscription: true
+      subscription: true,
+      relationship: true
     },
   });
 

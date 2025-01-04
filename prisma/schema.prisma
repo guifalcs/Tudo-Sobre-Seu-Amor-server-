@@ -30,7 +30,7 @@ model User {
   timeline        Timeline[]
   wishlist        Wishlist[]
   lovemap         Lovemap[]
-  relationship    Relationship[]
+  relationship    Relationship?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
