@@ -45,5 +45,5 @@ export const deleteTimeline = asyncHandler(async (req: Request, res: Response) =
   await prisma.timeline.delete({
     where: { id: req.params.id },
   });
-  res.status(204).send();
+  res.status(204).json("Evento deletado");
 });
