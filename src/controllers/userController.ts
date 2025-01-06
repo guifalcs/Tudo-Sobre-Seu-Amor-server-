@@ -51,7 +51,7 @@ export const getUserLogin = asyncHandler(
         wishlist: true,
         lovemap: true,
         subscription: true,
-        relationship: true
+        relationship: true,
       },
     });
 

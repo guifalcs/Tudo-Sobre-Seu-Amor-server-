@@ -5,7 +5,7 @@ import { validateAndParseDate } from '../utils/dateValidation';
 
 export const getSpecialDates = asyncHandler(async (req: Request, res: Response) => {
   const specialDates = await prisma.specialDate.findMany({
-    where: { userId: req.query.userId as string },
+    where: { userId: req.params.id as string },
   });
   res.json(specialDates);
 });
@@ -45,5 +45,5 @@ export const deleteSpecialDate = asyncHandler(async (req: Request, res: Response
   await prisma.specialDate.delete({
     where: { id: req.params.id },
   });
-  res.status(204).send();
+  res.status(204).json("Data deletada");
 });

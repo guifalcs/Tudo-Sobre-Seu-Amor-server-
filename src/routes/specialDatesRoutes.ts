@@ -10,7 +10,7 @@ import { specialDateSchema } from '../schemas/specialDateSchema';
 
 const router = Router();
 
-router.get('/', getSpecialDates);
+router.get('/:id', getSpecialDates);
 router.post('/', validateRequest(specialDateSchema), createSpecialDate);
 router.put('/:id', validateRequest(specialDateSchema), updateSpecialDate);
 router.delete('/:id', deleteSpecialDate);
