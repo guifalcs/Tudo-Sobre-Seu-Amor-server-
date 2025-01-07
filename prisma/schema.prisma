@@ -81,7 +81,6 @@ model Wishlist {
   link      String   @db.Text
   user      User     @relation(fields: [userId], references: [id])
   userId    String
-  purchased Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

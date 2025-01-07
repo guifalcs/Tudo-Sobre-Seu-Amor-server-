@@ -4,7 +4,7 @@ import asyncHandler from 'express-async-handler';
 
 export const getWishlistItems = asyncHandler(async (req: Request, res: Response) => {
   const wishlistItems = await prisma.wishlist.findMany({
-    where: { userId: req.query.userId as string },
+    where: { userId: req.params.userId },
   });
   res.json(wishlistItems);
 });
