@@ -4,9 +4,9 @@ import asyncHandler from 'express-async-handler';
 
 export const getLovemapItems = asyncHandler(async (req: Request, res: Response) => {
   const lovemapItems = await prisma.lovemap.findMany({
-    where: { userId: req.query.userId as string },
+    where: { userId: req.params.id },
   });
-  res.json(lovemapItems);
+  res.status(200).json(lovemapItems);
 });
 
 export const createLovemapItem = asyncHandler(async (req: Request, res: Response) => {
