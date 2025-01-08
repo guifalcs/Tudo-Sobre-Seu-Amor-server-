@@ -15,7 +15,7 @@ export const createCheckoutSession = asyncHandler(
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      payment_method_types: ["card", "pix"],
+      payment_method_types: ["card"],
       currency: "brl",
       line_items: [
         {
