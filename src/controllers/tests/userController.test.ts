@@ -228,8 +228,8 @@ describe('createUser', () => {
         name: 'Test User',
         email: 'test@example.com',
         password: 'password123',
-        status: 'active',
-        subscription: 'free',
+        status: 'Ativo',
+        subscription: 'Nenhum',
       },
     };
     mockRes = {
@@ -240,13 +240,13 @@ describe('createUser', () => {
   });
 
   it('should create user successfully', async () => {
-    const mockSubscription = { id: 'sub1', title: 'free' };
+    const mockSubscription = { id: 'sub1', title: 'Nenhum' };
     const mockUser = {
       id: '1',
       name: 'test user',
       email: 'test@example.com',
       password: 'hashedPassword',
-      status: 'active',
+      status: 'Ativo',
       subscription: mockSubscription,
     };
 
@@ -259,14 +259,14 @@ describe('createUser', () => {
     await createUser(mockReq as Request, mockRes as Response, mockNext);
 
     expect(prisma.subscription.findUnique).toHaveBeenCalledWith({
-      where: { title: 'free' },
+      where: { title: 'Nenhum' },
     });
     expect(prisma.user.create).toHaveBeenCalledWith({
       data: {
         name: 'test user',
         email: 'test@example.com',
         password: 'hashedPassword',
-        status: 'active',
+        status: 'Ativo',
         subscription: {
           connect: { id: 'sub1' },
         },
@@ -310,8 +310,8 @@ describe('updateUser', () => {
       body: {
         name: 'Updated User',
         email: 'updated@example.com',
-        status: 'inactive',
-        subscription: 'premium',
+        status: 'Inativo',
+        subscription: 'Romântico',
       },
     };
     mockRes = {
@@ -322,12 +322,12 @@ describe('updateUser', () => {
   });
 
   it('should update user successfully', async () => {
-    const mockSubscription = { id: 'sub2', title: 'premium' };
+    const mockSubscription = { id: 'sub2', title: 'Romântico' };
     const mockUpdatedUser = {
       id: '1',
       name: 'Updated User',
       email: 'updated@example.com',
-      status: 'inactive',
+      status: 'Inativo',
       subscription: mockSubscription,
       password: 'hashedPassword',
     };
