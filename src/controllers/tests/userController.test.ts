@@ -242,7 +242,6 @@ describe('createUser', () => {
   it('should create user successfully', async () => {
     const mockSubscription = { id: 'sub1', title: 'Nenhum' };
     const mockUser = {
-      id: '1',
       name: 'test user',
       email: 'test@example.com',
       password: 'hashedPassword',
