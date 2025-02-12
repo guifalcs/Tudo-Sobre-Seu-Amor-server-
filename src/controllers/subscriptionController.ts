@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { stripe, STRIPE_PRICES } from "../config/stripe";
 import { NotFoundError } from "../lib/errors";
+import Stripe from "stripe";
+import prisma from "../lib/prisma";
 
 export const createCheckoutSession = asyncHandler(
   async (req: Request, res: Response) => {
@@ -58,56 +60,120 @@ export const getSubscriptionPlans = asyncHandler(
   }
 );
 
-// export const handleWebhook = asyncHandler(async (req: Request, res: Response) => {
-//   const sig = req.headers['stripe-signature'];
+export const handleWebhook = asyncHandler(async (req: Request, res: Response) => {
+  const sig = req.headers['stripe-signature'];
 
-//   if (!process.env.STRIPE_WEBHOOK_SECRET || !sig) {
-//     throw new Error('Webhook secret not configured');
-//   }
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    throw new Error('Missing STRIPE_WEBHOOK_SECRET');
+  }
 
-//   let event;
+  try {
+    const event = stripe.webhooks.constructEvent(
+      req.body,
+      sig as string,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
 
-//   try {
-//     event = stripe.webhooks.constructEvent(
-//       req.body,
-//       sig,
-//       process.env.STRIPE_WEBHOOK_SECRET
-//     );
-//   } catch (err) {
-//     res.status(400).send(`Webhook Error: ${err}`);
-//     return;
-//   }
+    switch (event.type as any) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const userId = session.metadata?.userId;
 
-//   switch (event.type) {
-//     case 'checkout.session.completed': {
-//       const session = event.data.object;
-//       const userId = session.metadata!.userId;
-//       const subscriptionId = session.subscription as string;
+        if (!userId) {
+          throw new Error('No userId in session metadata');
+        }
 
-//       await prisma.user.update({
-//         where: { id: userId },
-//         data: {
-//           subscriptionId: subscriptionId,
-//           subscription: {
-//             connect: {
-//               stripeSubscriptionId: subscriptionId,
-//             },
-//           },
-//         },
-//       });
-//       break;
-//     }
-//     case 'customer.subscription.deleted': {
-//       const subscription = event.data.object;
-//       await prisma.user.updateMany({
-//         where: { subscriptionId: subscription.id },
-//         data: {
-//           subscriptionId: null,
-//         },
-//       });
-//       break;
-//     }
-//   }
+        // Map Stripe price IDs to subscription types
+        const subscriptionMap: { [key: string]: 'Nenhum' | 'Básico' | 'Romântico' | 'Apaixonado' } = {
+          [STRIPE_PRICES.BASICO]: 'Básico',
+          [STRIPE_PRICES.ROMANTICO]: 'Romântico',
+        };
 
-//   res.json({ received: true });
-// });
+        // Get the price ID from the session
+        const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+        const priceId = lineItems.data[0]?.price?.id;
+
+        if (!priceId) {
+          throw new Error('No price ID found in session');
+        }
+
+        // Update user subscription
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            subscription: {
+              connect: {
+                id: subscriptionMap[priceId] || 'Nenhum'
+              }
+            }
+          }
+        });
+
+        break;
+      }
+
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription;
+        // Handle subscription updates (e.g., plan changes, payment issues)
+        break;
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const userId = subscription.metadata?.userId;
+
+        if (userId) {
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              subscription: {
+                disconnect: true
+              }
+            }
+          });
+        }
+        break;
+      }
+
+      case 'payment_intent.succeeded': {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const userId = paymentIntent.metadata?.userId;
+
+        if (userId) {
+          // Handle successful payment (e.g., update user status or subscription)
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              status: 'Ativo' // Atualize conforme necessário
+            }
+          });
+        } else {
+          console.warn('User ID not found in payment intent metadata');
+        }
+        break;
+      }
+
+      case 'payment_intent.failed': {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const userId = paymentIntent.metadata?.userId;
+
+        if (userId) {
+          // Handle failed payment (e.g., update user status or notify user)
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              status: 'Inativo' // Atualize conforme necessário
+            }
+          });
+        } else {
+          console.warn('User ID not found in payment intent metadata');
+        }
+        break;
+      }
+    }
+    res.json({ received: true });
+  } catch (err) {
+    console.error('Webhook error:', err);
+    res.status(400).send(`Webhook Error: ${err}`);
+  }
+});
